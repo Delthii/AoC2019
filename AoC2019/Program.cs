@@ -6,7 +6,7 @@ namespace AoC2019
     {
         private static void Main(string[] args)
         {
-            var d = new Day1();
+            var d = new Day5();
             Console.WriteLine(d.PartA());
             Console.WriteLine(d.PartB());
             Console.ReadLine();
