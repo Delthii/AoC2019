@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace AoC2019
 {
-    class Program
+    internal class Program
     {
-        static async Task Main(string[] args)
+        private static void Main(string[] args)
         {
             var d = new Day1();
             Console.WriteLine(d.PartA());
