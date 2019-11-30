@@ -70,8 +70,14 @@ namespace AoC2019
         {
             var file = $"y{year}d{day}.txt";
             if (!File.Exists(file)) await $"get-input {year} {day} {file}".Bash();
-
+            if (!FileContainsInput(file))
+            {
+                File.Delete(file);
+                throw new Exception("No input yet!");
+            }
             return File.ReadAllLines(file);
         }
+
+        private static bool FileContainsInput(string file) => !File.Exists(file) && File.ReadAllText(file).Contains("don't repeatedly request this endpoint before it unlocks");
     }
 }

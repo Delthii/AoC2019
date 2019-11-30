@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace AoC2019
 {
-    internal class Day1 : AbstractDay
+    internal class Day18_1 : AbstractDay
     {
 
-        public Day1() : base(1, 2018)
+        public Day18_1() : base(1, 2018)
         {
         }
 
