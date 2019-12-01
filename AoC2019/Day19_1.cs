@@ -14,12 +14,22 @@ namespace AoC2019
 
         public override string PartA()
         {
-            return Lines.First();
+            return Lines.Select(int.Parse).Sum(d => d / 3 - 2).ToString();
         }
 
         public override string PartB()
         {
-            throw new NotImplementedException();
+            var fuels = Lines.Select(int.Parse);
+            var sum = 0;
+            var dsum = 0;
+            do
+            {
+                fuels = fuels.Select(d => d / 3 - 2 > 0 ? d / 3 - 2 : 0);
+                dsum = fuels.Sum();
+                sum += dsum;
+            } while (dsum > 0);
+
+            return sum + "";
         }
     }
 }
