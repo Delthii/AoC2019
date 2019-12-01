@@ -12,26 +12,20 @@ namespace AoC2019
         {
         }
 
-        public override string PartA()
-        {
-            return Lines.Select(int.Parse).Sum(CalcFuel).ToString();
-        }
+        public override string PartA() => Lines.Select(int.Parse).Sum(CalcFuel).ToString();
+        public override string PartB() => Lines.Select(int.Parse).Sum(RecCalcFuel).ToString();
 
-        private int CalcFuel(int weight)
-        {
-            return weight / 3 - 2;
-        }
-
-        public override string PartB()
-        {
-            return Lines.Select(int.Parse).Sum(RecCalcFuel).ToString();
-        }
+        private int CalcFuel(int weight) => weight / 3 - 2;
 
         private int RecCalcFuel(int weight)
         {
-            if (weight < 6) return 0;
-            var w = CalcFuel(weight);
-            return w + RecCalcFuel(w);
+            switch (CalcFuel(weight))
+            {
+                case int w when w < 0:
+                    return 0;
+                case int w:
+                    return w + RecCalcFuel(w);
+            }
         }
     }
 }
