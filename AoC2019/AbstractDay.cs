@@ -93,6 +93,11 @@ namespace AoC2019
                     throw new Exception("No input yet!");
                 }
 
+                if (text.Contains("404 Not Found"))
+                {
+                    throw new Exception("404");
+                }
+
                 if (text.Contains("Please log in to get your puzzle input"))
                 {
                     throw new Exception("Not logged in!");

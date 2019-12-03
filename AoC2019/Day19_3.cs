@@ -8,57 +8,47 @@ using System.Threading.Tasks;
 
 namespace AoC2019
 {
-    struct Point
-    {
-        public int x;
-        public int y;
-
-        public Point(int x, int y)
-        {
-            this.x = x;
-            this.y = y;
-        }
-    }
-
-    struct Line
-    {
-        public Line(Point p1, Point p2)
-        {
-            start = p1;
-            end = p2;
-        }
-        public Point start;
-        public Point end;
-    }
-
     class Day19_3 : AbstractDay
     {
-        public Day19_3() : base(2019, 3)
+        public Day19_3() : base(3, 2019)
         {
         }
 
+        private string[][] Input => Lines.Select(s => s.Split(',')).ToArray();
+
+        public override string PartA()
+        {
+            Init(out var lines1, out var lines2);
+            var intersections = IntersectLines(lines1, lines2);
+
+            return intersections.Min(p => Math.Abs(p.x) + Math.Abs(p.y)).ToString();
+        }
 
         public override string PartB()
         {
-            var input = File.ReadAllLines("C:\\Users\\pma\\source\\repos\\AoC2019\\AoC2019\\in.txt").Select(s => s.Split(',')).ToArray();
-            var w1 = input[0];
-            var w2 = input[1];
-            var lines1 = new List<Line>();
-            var lines2 = new List<Line>();
-            int x = sx;
-            int y = sy;
-            BRun(w1, lines1, x, y);
-            BRun(w2, lines2, x, y);
+            Init(out var lines1, out var lines2);
+            var combinedDistance = IntersectLinesB(lines1, lines2);
 
-            return "";
+            return combinedDistance.Min().ToString();
         }
 
-        private static void BRun(string[] w, List<Line> lines, int x, int y)
+        private void Init(out List<Line> lines1, out List<Line> lines2)
         {
-            for (int i = 0; i < w.Length; i++)
+            var w1 = Input[0];
+            var w2 = Input[1];
+            lines1 = new List<Line>();
+            lines2 = new List<Line>();
+            DrawWire(w1, lines1);
+            DrawWire(w2, lines2);
+        }
+
+        private static void DrawWire(string[] wireVectors, ICollection<Line> lines)
+        {
+            int x = 0, y = 0;
+            foreach (var vector in wireVectors)
             {
-                var dir = w[i][0];
-                var length = int.Parse(w[i].Substring(1));
+                var dir = vector[0];
+                var length = int.Parse(vector.Substring(1));
                 switch (dir)
                 {
                     case 'U':
@@ -81,96 +71,45 @@ namespace AoC2019
             }
         }
 
-        bool[,] matrix = new bool[40000, 40000];
-        private int min = 1000000000;
-        private int dx;
-        private int dy;
-        private int sx = 20000;
-        private int sy = 20000;
-
-        public override string PartA()
+        private static IEnumerable<Point> IntersectLines(IEnumerable<Line> lines1, IEnumerable<Line> lines2)
         {
-            var input = File.ReadAllLines("C:\\Users\\pma\\source\\repos\\AoC2019\\AoC2019\\in.txt").Select(s => s.Split(',')).ToArray();
+            var intersections = new List<Point>();
 
-            var w1 = input[0];
-            var w2 = input[1];
-
-            DrawWire(w1,(char)1);
-            Console.WriteLine();
-            DrawWire(w2, (char)2);
-
-            return "";
-        }
-
-        private void DrawWire(string[] w1, char wire)
-        {
-            int x = sx;
-            int y = sy;
-            for (int i = 0; i < w1.Length; i++)
+            foreach (var line1 in lines1)
             {
-                var dir = w1[i][0];
-                var length = int.Parse(w1[i].Substring(1));
-                switch (dir)
+                foreach (var line2 in lines2)
                 {
-                    case 'U':
-                        Col(matrix, y, y+length, x, wire);
-                        y += length;
-                        break;
-                    case 'D':
-                        Col(matrix, y-length, y, x, wire);
-                        y -= length;
-                        break;
-                    case 'R':
-                        Row(matrix, x, x+length, y, wire);
-                        x += length;
-                        break;
-                    case 'L':
-                        Row(matrix, x-length, x, y, wire);
-                        x -= length;
-                        break;
+                    if (line1.TryIntersect(line2, out var point))
+                    {
+                        intersections.Add(point);
+                    }
                 }
-                Console.WriteLine(x + " " + y);
             }
+
+            return intersections;
         }
 
-        private void Row(bool[,] m, int start, int end, int y, char wire)
+        private static IEnumerable<int> IntersectLinesB(IEnumerable<Line> lines1, IEnumerable<Line> lines2)
         {
-            for (int x = start; x < end; x++)
+            var intersections = new List<int>();
+            var p1 = 0;
+
+            foreach (var line1 in lines1)
             {
-                if (m[x, y] && wire == 2)
+                var p2 = 0;
+                foreach (var line2 in lines2)
                 {
-                    NoteIntersection(x, y);
+                    if (line1.TryIntersect(line2, out var point))
+                    {
+                        var cd = p1+p2 + new Line(line1.start, point).Length() + new Line(line2.start, point).Length();
+                        intersections.Add(cd);
+                    }
+                    p2 += line2.Length();
                 }
-                m[x, y] = wire == 1;
-
+                p1 += line1.Length();
             }
+
+            return intersections;
         }
-
-        private void Col(bool[,] m, int start, int end, int x, char wire)
-        {
-            for (int y = start; y < end; y++)
-            {
-                if (m[x, y] && wire == 2)
-                {
-                    NoteIntersection(x, y);
-                }
-                m[x, y] = wire == 1;
-            }
-        }
-
-        
-
-        private void NoteIntersection(int x, int y)
-        {
-            var dist = Math.Abs(x - sx) + Math.Abs(y - sy);
-            if (dist < min && dist != 0)
-            {
-                dx = x;
-                dy = y;
-                min = dist;
-            }
-        }
-
-        
     }
 }

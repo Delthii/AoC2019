@@ -94,8 +94,11 @@
     <Compile Include="Day19_1.cs" />
     <Compile Include="Day19_2.cs" />
     <Compile Include="Day19_3.cs" />
+    <Compile Include="Day19_4.cs" />
     <Compile Include="Day5.cs" />
     <Compile Include="IDay.cs" />
+    <Compile Include="Line.cs" />
+    <Compile Include="Point.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
