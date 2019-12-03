@@ -10,8 +10,8 @@ namespace AoC2019
         private static void Main(string[] args)
         {
             var da = new Day19_3();
-            Console.WriteLine(da.PartA());
-            //Console.WriteLine(da.PartB());
+            //Console.WriteLine(da.PartA());
+            Console.WriteLine(da.PartB());
            
         }
     }
