@@ -9,9 +9,8 @@ namespace AoC2019
     {
         private static void Main(string[] args)
         {
-            var da = new Day19_4();
+            var da = new Day2019_5();
             Console.WriteLine(da.PartA());
-            Console.WriteLine(da.PartB());
            
         }
     }
