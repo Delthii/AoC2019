@@ -58,13 +58,8 @@ namespace AoC2019
                         i += 2;
                         break;
                     case 4:
-                        var output = program[program[i + 1]];
-                        if (output != 0)
-                        {
-
-                            program[program[i + 1]] -= output;
-                            Console.WriteLine(output);
-                        }
+                        var output = C == 0 ? program[program[i + 1]] : program[i + 1];
+                        Console.WriteLine(output);
                         i += 2;
                         break;
                     case 5:
@@ -72,6 +67,14 @@ namespace AoC2019
                         break;
                     case 6:
                         JumpIfFalse(program, program[i + 1], program[i + 2], ref i);
+                        break;
+                    case 7:
+                        LessThan(program, program[i + 1], program[i + 2], program[i + 3]);
+                        i += 4;
+                        break;
+                    case 8:
+                        Equals(program, program[i + 1], program[i + 2], program[i + 3]);
+                        i += 4;
                         break;
                     case 99:
                         return;
@@ -103,18 +106,36 @@ namespace AoC2019
 
         private void JumpIfTrue(int[] program, int first, int second, ref int i)
         {
-            if (program[first] != 0)
+            if ((C == 0 ? program[first] : first) != 0)
             {
-                i= program[second];
+                i = B == 0 ? program[second] : second;
+            }
+            else
+            {
+                i += 3;
             }
         }
 
         private void JumpIfFalse(int[] program, int first, int second, ref int i)
         {
-            if (program[first] == 0)
+            if ((C == 0 ? program[first] : first)== 0)
             {
-                i = program[second];
+                i = B == 0 ? program[second] : second;
             }
+            else
+            {
+                i += 3;
+            }
+        }
+
+        private void LessThan(int[] program, int first, int second,int store)
+        {
+            program[store] = ((C == 0 ? program[first] : first) < (B == 0 ? program[second] : second)) ? 1 : 0;
+        }
+
+        private void Equals(int[] program, int first, int second, int store)
+        {
+            program[store] = ((C == 0 ? program[first] : first) == (B == 0 ? program[second] : second)) ? 1 : 0;
         }
 
     }

@@ -11,7 +11,7 @@ namespace AoC2019
     {
         public override string PartA()
         {
-            var input = File.ReadAllLines("..\\..\\in.txt").First().Split(',').Select(int.Parse).ToArray();
+            var input = File.ReadAllLines("..\\..\\..\\in.txt").First().Split(',').Select(int.Parse).ToArray();
             var c = new Compiler();
             c.Run(input);
             return "";
@@ -19,7 +19,10 @@ namespace AoC2019
 
         public override string PartB()
         {
-            throw new NotImplementedException();
+            var input = File.ReadAllLines("..\\..\\..\\in.txt").First().Split(',').Select(int.Parse).ToArray();
+            var c = new Compiler();
+            c.Run(input);
+            return "";
         }
     }
 }
