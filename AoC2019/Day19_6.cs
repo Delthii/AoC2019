@@ -32,24 +32,13 @@ namespace AoC2019
 
         private Node FindCommonNode()
         {
-            Node common = null;
-
-            var visited = new HashSet<Node>();
+            var yourOrbits = new HashSet<Node>();
             foreach (var n in YOU.GetPath())
             {
-                visited.Add(n);
+                yourOrbits.Add(n);
             }
 
-            foreach (var n in SAN.GetPath())
-            {
-                if (visited.Contains(n))
-                {
-                    common = n;
-                    break;
-                }
-            }
-
-            return common;
+            return SAN.GetPath().FirstOrDefault(n => yourOrbits.Contains(n));
         }
 
         private void Init()
