@@ -7,20 +7,27 @@ using System.Threading.Tasks;
 
 namespace AoC2019
 {
-    class Day2019_5 : AbstractDay
+    class Day19_5 : AbstractDay
     {
+        public Day19_5() : base(5,2019)
+        {
+            
+        }
+
         public override string PartA()
         {
-            var input = File.ReadAllLines("..\\..\\..\\in.txt").First().Split(',').Select(int.Parse).ToArray();
+            var input = Lines.First().Split(',').Select(int.Parse).ToArray();
             var c = new Compiler();
+            c.Input.Add(1);
             c.Run(input);
             return "";
         }
 
         public override string PartB()
         {
-            var input = File.ReadAllLines("..\\..\\..\\in.txt").First().Split(',').Select(int.Parse).ToArray();
+            var input = Lines.First().Split(',').Select(int.Parse).ToArray();
             var c = new Compiler();
+            c.Input.Add(5);
             c.Run(input);
             return "";
         }

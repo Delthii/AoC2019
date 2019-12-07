@@ -1,46 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace AoC2019
 {
     class Compiler
     {
+        public ConcurrentBag<int> Input { get; } = new ConcurrentBag<int>();
+        public ConcurrentBag<int> Output { get; set; } = new ConcurrentBag<int>();
+        public int LastOut = -123;
+
         int A = 0, B = 0, C = 0;
-        public void Run(int[] program)
+
+        public void Run(int[] program, int phase, bool a)
         {
+            Input.Add(phase);
+
             for (var i = 0; i < program.Length; )
             {
-                A = 0;
-                B = 0;
-                C = 0;
-                var op = program[i].ToString();
-                int code;
-                if (op.Length == 5)
-                {
-                    A = int.Parse(op.Substring(0, 1));
-                    B = int.Parse(op.Substring(1, 1));
-                    C = int.Parse(op.Substring(2, 1));
-                    code = int.Parse(op.Substring(3, 2));
-                }
-                else if (op.Length == 4)
-                {
-                    B = int.Parse(op.Substring(0, 1));
-                    C = int.Parse(op.Substring(1, 1));
-                    code = int.Parse(op.Substring(2, 2));
-                }
-                else if (op.Length == 3)
-                {
-                    C = int.Parse(op.Substring(0, 1));
-                    code = int.Parse(op.Substring(1, 2));
-                }
-                else
-                {
-                    code = int.Parse(op.Substring(0));
-                }
+                var code = ParseInput(program, i);
 
                 switch (code)
                 {
@@ -53,13 +30,102 @@ namespace AoC2019
                         i += 4;
                         break;
                     case 3:
-                        var input = Console.ReadLine();
-                        program[program[i + 1]] = int.Parse(input);
+                        int inp;
+                        while (!Input.TryTake(out inp))
+                        {
+                        }
+                        
+                        program[program[i + 1]] = inp;
                         i += 2;
                         break;
                     case 4:
-                        var output = C == 0 ? program[program[i + 1]] : program[i + 1];
-                        Console.WriteLine(output);
+                        LastOut = C == 0 ? program[program[i + 1]] : program[i + 1];
+                        Output.Add(LastOut);
+                        if (a) return;
+                        i += 2;
+                        break;
+                    case 5:
+                        JumpIfTrue(program, program[i + 1], program[i + 2], ref i);
+                        break;
+                    case 6:
+                        JumpIfFalse(program, program[i + 1], program[i + 2], ref i);
+                        break;
+                    case 7:
+                        LessThan(program, program[i + 1], program[i + 2], program[i + 3]);
+                        i += 4;
+                        break;
+                    case 8:
+                        Equals(program, program[i + 1], program[i + 2], program[i + 3]);
+                        i += 4;
+                        break;
+                    case 99:
+                        return;
+                    default:
+                        throw new Exception("Invalid OP-Code");
+                }
+            }
+
+            throw new Exception("No output :/");
+        }
+
+        private int ParseInput(int[] program, int i)
+        {
+            A = 0;
+            B = 0;
+            C = 0;
+            var op = program[i].ToString();
+            int code;
+            if (op.Length == 5)
+            {
+                A = int.Parse(op.Substring(0, 1));
+                B = int.Parse(op.Substring(1, 1));
+                C = int.Parse(op.Substring(2, 1));
+                code = int.Parse(op.Substring(3, 2));
+            }
+            else if (op.Length == 4)
+            {
+                B = int.Parse(op.Substring(0, 1));
+                C = int.Parse(op.Substring(1, 1));
+                code = int.Parse(op.Substring(2, 2));
+            }
+            else if (op.Length == 3)
+            {
+                C = int.Parse(op.Substring(0, 1));
+                code = int.Parse(op.Substring(1, 2));
+            }
+            else
+            {
+                code = int.Parse(op.Substring(0));
+            }
+
+            return code;
+        }
+
+        public void Run(int[] program)
+        {
+            for (var i = 0; i < program.Length;)
+            {
+                var code = ParseInput(program, i);
+
+                switch (code)
+                {
+                    case 1:
+                        Add(program, program[i + 1], program[i + 2], program[i + 3]);
+                        i += 4;
+                        break;
+                    case 2:
+                        Multiply(program, program[i + 1], program[i + 2], program[i + 3]);
+                        i += 4;
+                        break;
+                    case 3:
+                        int inp;
+                        Input.TryTake(out inp);
+                        program[program[i + 1]] = inp;
+                        i += 2;
+                        break;
+                    case 4:
+                        var outp = C == 0 ? program[program[i + 1]] : program[i + 1];
+                        Console.WriteLine(outp);
                         i += 2;
                         break;
                     case 5:
