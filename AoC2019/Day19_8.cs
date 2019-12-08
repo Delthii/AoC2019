@@ -8,46 +8,41 @@ namespace AoC2019
 {
     class Day19_8 : AbstractDay
     {
-        private int width = 25;
-        private int height = 6;
-
+        private const int Width = 25;
+        private const int Height = 6;
+        private static int Area => Width * Height;
         public Day19_8() : base(8,2019)
         {
         }
 
         public override string PartA()
         {
-            var digits = Lines.First().ToCharArray().Select(c => (int)(c - '0')).ToArray();
-            var layers = new List<List<int>>();
-            var area = width * height;
-            List<int> currentLayer = null;
-            int cnt = 0;
-            foreach (var d in digits)
-            {
-                if (cnt % area == 0)
-                {
-                    currentLayer = new List<int>();
-                    layers.Add(currentLayer);
-                }
-                currentLayer.Add(d);
-                ++cnt;
-            }
+            var layers = GetLayers();
 
             var max = layers.OrderBy(l => l.Count(d => d == 0)).First();
             var ans = max.Count(d => d == 1) * max.Count(d => d == 2);
-            return "" + ans;
+            return ans.ToString();
         }
 
         public override string PartB()
         {
-            var digits = Lines.First().ToCharArray().Select(c => (int)(c - '0')).ToArray();
+            var msg = GetEmptyMessage();
+
+            Decrypt(GetLayers(), msg);
+            PrintImage(msg);
+
+            return "";
+        }
+
+        private List<List<int>> GetLayers()
+        {
+            var digits = Lines.First().ToCharArray().Select(c => c - '0').ToArray();
             var layers = new List<List<int>>();
-            var area = width * height;
             List<int> currentLayer = null;
             int cnt = 0;
             foreach (var d in digits)
             {
-                if (cnt % area == 0)
+                if (cnt % Area == 0)
                 {
                     currentLayer = new List<int>();
                     layers.Add(currentLayer);
@@ -56,8 +51,11 @@ namespace AoC2019
                 ++cnt;
             }
 
-            var msg = new List<int>();
-            for(int i = 0; i< area; i++)msg.Add(2);
+            return layers;
+        }
+
+        private static void Decrypt(List<List<int>> layers, List<int> msg)
+        {
             foreach (var layer in layers)
             {
                 for (int i = 0; i < layer.Count; i++)
@@ -65,18 +63,25 @@ namespace AoC2019
                     if (msg[i] == 2) msg[i] = layer[i];
                 }
             }
+        }
 
-            for (int j = 0; j < height; j++)
+        private static void PrintImage(List<int> msg)
+        {
+            for (int j = 0; j < Height; j++)
             {
-                for (int i = 0; i < width; i++)
+                for (int i = 0; i < Width; i++)
                 {
-                    Console.Write(msg[width*j +i] == 0? " " : "|");
+                    Console.Write(msg[Width * j + i] == 0 ? " " : "|");
                 }
-
                 Console.WriteLine();
             }
+        }
 
-            return "";
+        private static List<int> GetEmptyMessage()
+        {
+            var msg = new List<int>();
+            for (var i = 0; i < Area; i++) msg.Add(2);
+            return msg;
         }
     }
 }
