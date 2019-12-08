@@ -16,7 +16,28 @@ namespace AoC2019
         public override string PartA()
         {
             var program = Lines.First().Split(',').Select(int.Parse).ToArray();
+            var outputs = new List<int>();
 
+            foreach (var phase in PhasesA())
+            {
+                InitCompilers(out var ca, out var cb, out var cc, out var cd, out var ce, phase, program);
+                do
+                {
+                    while (ca.Step() == State.Running) { }
+                    while (cb.Step() == State.Running) { }
+                    while (cc.Step() == State.Running) { }
+                    while (cd.Step() == State.Running) { }
+                    while (ce.Step() == State.Running) { }
+                } while (!ce.Done());
+                outputs.Add(ce.LastOut);
+            }
+
+            return outputs.Max() + "";
+        }
+
+        public override string PartB()
+        {
+            var program = Lines.First().Split(',').Select(int.Parse).ToArray();
             var outputs = new List<int>();
 
             foreach (var phase in PhasesB())
@@ -30,23 +51,7 @@ namespace AoC2019
                     while (cd.Step() == State.Running) { }
                     while (ce.Step() == State.Running) { }
                 } while (!ce.Done());
-                Console.WriteLine(ce.LastOut);
                 outputs.Add(ce.LastOut);
-            }
-            Console.WriteLine(outputs.Max());
-
-            return outputs.Max() + "";
-        }
-
-        public override string PartB()
-        {
-            var program = Lines.First().Split(',').Select(int.Parse);
-
-            var outputs = new List<int>();
-
-            foreach (var phases in PhasesB())
-            {
-             //outputs.Add(ce.LastOut);
             }
 
             return outputs.Max() + "";
@@ -54,7 +59,7 @@ namespace AoC2019
 
         private static void InitCompilers(out SeqCompiler ca, out SeqCompiler cb, out SeqCompiler cc, out SeqCompiler cd, out SeqCompiler ce, int[] phase, int[] program)
         {
-            var inpA = new List<int>{0, phase[0]};   
+            var inpA = new List<int> { phase[0], 0};   
             var inpB = new List<int> { phase[1] };
             var inpC = new List<int> { phase[2] };
             var inpD = new List<int> { phase[3] };
