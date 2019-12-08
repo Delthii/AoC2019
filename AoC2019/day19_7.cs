@@ -9,6 +9,11 @@ namespace AoC2019
 {
     class Day19_7 : AbstractDay
     {
+
+        public Day19_7() : base(7,2019)
+        {
+        }
+        
         public override string PartA()
         {
             var program = Lines.First().Split(',').Select(int.Parse);

@@ -98,12 +98,15 @@
     <Compile Include="Day19_6.cs" />
     <Compile Include="Day19_7.cs" />
     <Compile Include="Day19_5.cs" />
+    <Compile Include="Day19_7_rework.cs" />
+    <Compile Include="Day19_8.cs" />
     <Compile Include="Day5.cs" />
     <Compile Include="IDay.cs" />
     <Compile Include="Line.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SeqCompiler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
