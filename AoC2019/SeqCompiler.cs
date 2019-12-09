@@ -60,7 +60,15 @@ namespace AoC2019
                 case 3:
                     if (Input.Count == 0)
                         return State.Waiting;
-                    program[GetMode(program[i + 1], C)] = Input[0];
+                    //program[program[i + 1]]
+                    if (C == 2)
+                    {
+                        program[program[i + 1] + r] = Input[0];
+                    }
+                    else
+                    {
+                        program[GetMode(program[i + 1], C)] = Input[0];
+                    }
                     Input.RemoveAt(0);
                     i += 2;
                     break;
@@ -157,12 +165,7 @@ namespace AoC2019
 
         private void Instruction(long first, long second, long store, Func<long, long, long> func)
         {
-            program[store] = func(GetMode(first, C), GetMode(second, B));
-        }
-
-        private void Instruction(long first, long second, long third, long store, Func<long, long, long> func)
-        {
-            program[store] = func(GetMode(first, C), GetMode(second, B));
+            program[store + (A == 2 ? r : 0)] = func(GetMode(first, C), GetMode(second, B));
         }
 
         private void Add(long first, long second, long store)
@@ -201,17 +204,17 @@ namespace AoC2019
 
         private void LessThan(long first, long second, long store)
         {
-            program[store] = (GetMode(first, C) < GetMode(second, B)) ? 1 : 0;
+            program[store + (A == 2 ? r : 0)] = (GetMode(first, C) < GetMode(second, B)) ? 1 : 0;
         }
 
         private void Equals(long first, long second, long store)
         {
-            program[store] = (GetMode(first, C) == GetMode(second, B)) ? 1 : 0;
+            program[store + (A == 2 ? r : 0)] = (GetMode(first, C) == GetMode(second, B)) ? 1 : 0;
         }
 
         private void RelativeBase(long first)
         {
-            r += GetMode(first, A);
+            r += GetMode(first, C);
             i += 2;
         }
 
