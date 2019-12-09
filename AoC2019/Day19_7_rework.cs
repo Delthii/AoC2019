@@ -19,18 +19,18 @@ namespace AoC2019
             return Core(Phases(5,9));
         }
 
-        public string Core(IEnumerable<int[]> phases)
+        public string Core(IEnumerable<long[]> phases)
         {
-            var program = Lines.First().Split(',').Select(int.Parse).ToArray();
-            var outputs = new List<int>();
+            var program = Lines.First().Split(',').Select(long.Parse).ToArray();
+            var outputs = new List<long>();
 
             foreach (var phase in phases)
             {
-                var inpA = new List<int> { phase[0], 0 };
-                var inpB = new List<int> { phase[1] };
-                var inpC = new List<int> { phase[2] };
-                var inpD = new List<int> { phase[3] };
-                var inpE = new List<int> { phase[4] };
+                var inpA = new List<long> { phase[0], 0 };
+                var inpB = new List<long> { phase[1] };
+                var inpC = new List<long> { phase[2] };
+                var inpD = new List<long> { phase[3] };
+                var inpE = new List<long> { phase[4] };
                 var ca = new SeqCompiler(inpA, inpB, program.ToArray());
                 var cb = new SeqCompiler(inpB, inpC, program.ToArray());
                 var cc = new SeqCompiler(inpC, inpD, program.ToArray());
@@ -50,15 +50,15 @@ namespace AoC2019
             return outputs.Max() + "";
         }
 
-        IEnumerable<int[]> Phases(int lower, int upper)
+        IEnumerable<long[]> Phases(long lower, long upper)
         {
-            for (int A = lower; A <= upper; ++A)
-            for (int B = lower; B <= upper; ++B)
-            for (int C = lower; C <= upper; ++C)
-            for (int D = lower; D <= upper; ++D)
-            for (int E = lower; E <= upper; ++E)
+            for (long A = lower; A <= upper; ++A)
+            for (long B = lower; B <= upper; ++B)
+            for (long C = lower; C <= upper; ++C)
+            for (long D = lower; D <= upper; ++D)
+            for (long E = lower; E <= upper; ++E)
             {
-                var set = new HashSet<int>();
+                var set = new HashSet<long>();
                 set.Add(A);
                 set.Add(B);
                 set.Add(C);

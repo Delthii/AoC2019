@@ -16,9 +16,9 @@ namespace AoC2019
 
         public override string PartA()
         {
-            var input = Lines.First().Split(',').Select(int.Parse).ToArray();
-            var inp = new List<int> {1};
-            var outp = new List<int>();
+            var input = Lines.First().Split(',').Select(long.Parse).ToArray();
+            var inp = new List<long> {1};
+            var outp = new List<long>();
             var c = new SeqCompiler(inp,outp, input);
             c.Run();
             return outp[outp.Count - 1] + "";
@@ -26,9 +26,9 @@ namespace AoC2019
 
         public override string PartB()
         {
-            var input = Lines.First().Split(',').Select(int.Parse).ToArray();
-            var inp = new List<int> { 5 };
-            var outp = new List<int>();
+            var input = Lines.First().Split(',').Select(long.Parse).ToArray();
+            var inp = new List<long> { 5 };
+            var outp = new List<long>();
             var c = new SeqCompiler(inp, outp, input);
             c.Run();
             return outp[outp.Count - 1] + "";

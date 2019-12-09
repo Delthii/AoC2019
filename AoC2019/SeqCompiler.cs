@@ -17,18 +17,23 @@ namespace AoC2019
     class SeqCompiler
     {
 
-        private List<int> Input { get; }
-        private List<int> Output { get; }
-        private readonly int[] program;
-        public int LastOut = -123132123;
-        private int i;
-        int A = 0, B = 0, C = 0;
+        private List<long> Input { get; }
+        private List<long> Output { get; }
+        private readonly Dictionary<long,long> program;
+        public long LastOut = -123132123;
+        private long i;
+        private long r;
+        long A = 0, B = 0, C = 0;
 
-        public SeqCompiler(List<int> input, List<int> output, int[] program)
+        public SeqCompiler(List<long> input, List<long> output, long[] program)
         {
             Input = input;
             Output = output;
-            this.program = program;
+            this.program = new Dictionary<long, long>();
+            for (int i = 0; i < program.Length; i++)
+            {
+                this.program[i] = program[i];
+            }
         }
 
         public void Run()
@@ -40,43 +45,47 @@ namespace AoC2019
 
         public State Step()
         {
-            var code = ParseInput(program);
+            var code = ParseInput();
 
             switch (code)
             {
                 case 1:
-                    Add(program, program[i + 1], program[i + 2], program[i + 3]);
+                    Add( program[i + 1], program[i + 2], program[i + 3]);
                     i += 4;
                     break;
                 case 2:
-                    Multiply(program, program[i + 1], program[i + 2], program[i + 3]);
+                    Multiply( program[i + 1], program[i + 2], program[i + 3]);
                     i += 4;
                     break;
                 case 3:
                     if (Input.Count == 0)
                         return State.Waiting;
-                    program[program[i + 1]] = Input[0];
+                    program[GetMode(program[i + 1], C)] = Input[0];
                     Input.RemoveAt(0);
                     i += 2;
                     break;
                 case 4:
                     LastOut = C == 0 ? program[program[i + 1]] : program[i + 1];
+                    LastOut = C == 2 ? program[program[i + 1] + r] : LastOut;
                     Output.Add(LastOut);
                     i += 2;
                     break;
                 case 5:
-                    JumpIfTrue(program, program[i + 1], program[i + 2]);
+                    JumpIfTrue( program[i + 1], program[i + 2]);
                     break;
                 case 6:
-                    JumpIfFalse(program, program[i + 1], program[i + 2]);
+                    JumpIfFalse( program[i + 1], program[i + 2]);
                     break;
                 case 7:
-                    LessThan(program, program[i + 1], program[i + 2], program[i + 3]);
+                    LessThan(program[i + 1], program[i + 2], program[i + 3]);
                     i += 4;
                     break;
                 case 8:
-                    Equals(program, program[i + 1], program[i + 2], program[i + 3]);
+                    Equals(program[i + 1], program[i + 2], program[i + 3]);
                     i += 4;
+                    break;
+                case 9:
+                    RelativeBase(program[i + 1]);
                     break;
                 case 99:
                     return State.Done;
@@ -92,64 +101,85 @@ namespace AoC2019
             return Step() == State.Done;
         }
 
-        private int ParseInput(int[] program)
+        private long ParseInput()
         {
             A = 0;
             B = 0;
             C = 0;
             var op = program[i].ToString();
-            int code;
+            long code;
             if (op.Length == 5)
             {
-                A = int.Parse(op.Substring(0, 1));
-                B = int.Parse(op.Substring(1, 1));
-                C = int.Parse(op.Substring(2, 1));
-                code = int.Parse(op.Substring(3, 2));
+                A = long.Parse(op.Substring(0, 1));
+                B = long.Parse(op.Substring(1, 1));
+                C = long.Parse(op.Substring(2, 1));
+                code = long.Parse(op.Substring(3, 2));
             }
             else if (op.Length == 4)
             {
-                B = int.Parse(op.Substring(0, 1));
-                C = int.Parse(op.Substring(1, 1));
-                code = int.Parse(op.Substring(2, 2));
+                B = long.Parse(op.Substring(0, 1));
+                C = long.Parse(op.Substring(1, 1));
+                code = long.Parse(op.Substring(2, 2));
             }
             else if (op.Length == 3)
             {
-                C = int.Parse(op.Substring(0, 1));
-                code = int.Parse(op.Substring(1, 2));
+                C = long.Parse(op.Substring(0, 1));
+                code = long.Parse(op.Substring(1, 2));
             }
             else
             {
-                code = int.Parse(op.Substring(0));
+                code = long.Parse(op.Substring(0));
             }
 
             return code;
         }
 
-        private void Instruction(int[] program, int first, int second, int store, Func<int, int, int> func)
+        private long GetMode(long parameter, long mode)
         {
-            program[store] = func(C == 0 ? program[first] : first, B == 0 ? program[second] : second);
-        }
-
-        private void Instruction(int[] program, int first, int second, int third, int store, Func<int, int, int> func)
-        {
-            program[store] = func(C == 0 ? program[first] : first, B == 0 ? program[second] : second);
-        }
-
-        private void Add(int[] program, int first, int second, int store)
-        {
-            Instruction(program, first, second, store, (a, b) => a + b);
-        }
-
-        private void Multiply(int[] program, int first, int second, int store)
-        {
-            Instruction(program, first, second, store, (a, b) => a * b);
-        }
-
-        private void JumpIfTrue(int[] program, int first, int second)
-        {
-            if ((C == 0 ? program[first] : first) != 0)
+            if (mode == 0)
             {
-                i = B == 0 ? program[second] : second;
+                return GetMemory(parameter);
+            }
+
+            if (mode == 1)
+            {
+                return parameter;
+            }
+
+            return GetMemory(parameter + r);
+        }
+
+        private long GetMemory(long index)
+        {
+            if (!program.ContainsKey(index)) program[index] = 0;
+            return program[index];
+        }
+
+        private void Instruction(long first, long second, long store, Func<long, long, long> func)
+        {
+            program[store] = func(GetMode(first, C), GetMode(second, B));
+        }
+
+        private void Instruction(long first, long second, long third, long store, Func<long, long, long> func)
+        {
+            program[store] = func(GetMode(first, C), GetMode(second, B));
+        }
+
+        private void Add(long first, long second, long store)
+        {
+            Instruction(first, second, store, (a, b) => a + b);
+        }
+
+        private void Multiply(long first, long second, long store)
+        {
+            Instruction(first, second, store, (a, b) => a * b);
+        }
+
+        private void JumpIfTrue(long first, long second)
+        {
+            if (GetMode(first, C) != 0)
+            {
+                i = GetMode(second, B);
             }
             else
             {
@@ -157,11 +187,11 @@ namespace AoC2019
             }
         }
 
-        private void JumpIfFalse(int[] program, int first, int second)
+        private void JumpIfFalse(long first, long second)
         {
-            if ((C == 0 ? program[first] : first) == 0)
+            if (GetMode(first, C) == 0)
             {
-                i = B == 0 ? program[second] : second;
+                i = GetMode(second, B);
             }
             else
             {
@@ -169,14 +199,20 @@ namespace AoC2019
             }
         }
 
-        private void LessThan(int[] program, int first, int second, int store)
+        private void LessThan(long first, long second, long store)
         {
-            program[store] = ((C == 0 ? program[first] : first) < (B == 0 ? program[second] : second)) ? 1 : 0;
+            program[store] = (GetMode(first, C) < GetMode(second, B)) ? 1 : 0;
         }
 
-        private void Equals(int[] program, int first, int second, int store)
+        private void Equals(long first, long second, long store)
         {
-            program[store] = ((C == 0 ? program[first] : first) == (B == 0 ? program[second] : second)) ? 1 : 0;
+            program[store] = (GetMode(first, C) == GetMode(second, B)) ? 1 : 0;
+        }
+
+        private void RelativeBase(long first)
+        {
+            r += GetMode(first, A);
+            i += 2;
         }
 
     }
