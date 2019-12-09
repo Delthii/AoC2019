@@ -58,24 +58,13 @@ namespace AoC2019
                     i += 4;
                     break;
                 case 3:
-                    if (Input.Count == 0)
-                        return State.Waiting;
-                    //program[program[i + 1]]
-                    if (C == 2)
-                    {
-                        program[program[i + 1] + r] = Input[0];
-                    }
-                    else
-                    {
-                        program[GetMode(program[i + 1], C)] = Input[0];
-                    }
+                    if (Input.Count == 0) return State.Waiting;
+                    program[GetStoreIndex(program[i+1], C)] = Input[0];
                     Input.RemoveAt(0);
                     i += 2;
                     break;
                 case 4:
-                    LastOut = C == 0 ? program[program[i + 1]] : program[i + 1];
-                    LastOut = C == 2 ? program[program[i + 1] + r] : LastOut;
-                    Output.Add(LastOut);
+                    Output.Add(LastOut = GetValue(program[i + 1], C));
                     i += 2;
                     break;
                 case 5:
@@ -121,39 +110,31 @@ namespace AoC2019
                 A = long.Parse(op.Substring(0, 1));
                 B = long.Parse(op.Substring(1, 1));
                 C = long.Parse(op.Substring(2, 1));
-                code = long.Parse(op.Substring(3, 2));
+                code = long.Parse(op.Substring(3));
             }
             else if (op.Length == 4)
             {
                 B = long.Parse(op.Substring(0, 1));
                 C = long.Parse(op.Substring(1, 1));
-                code = long.Parse(op.Substring(2, 2));
+                code = long.Parse(op.Substring(2));
             }
             else if (op.Length == 3)
             {
                 C = long.Parse(op.Substring(0, 1));
-                code = long.Parse(op.Substring(1, 2));
+                code = long.Parse(op.Substring(1));
             }
             else
             {
-                code = long.Parse(op.Substring(0));
+                code = long.Parse(op);
             }
 
             return code;
         }
 
-        private long GetMode(long parameter, long mode)
+        private long GetValue(long parameter, long mode)
         {
-            if (mode == 0)
-            {
-                return GetMemory(parameter);
-            }
-
-            if (mode == 1)
-            {
-                return parameter;
-            }
-
+            if (mode == 0) return GetMemory(parameter);
+            if (mode == 1) return parameter;
             return GetMemory(parameter + r);
         }
 
@@ -165,7 +146,12 @@ namespace AoC2019
 
         private void Instruction(long first, long second, long store, Func<long, long, long> func)
         {
-            program[store + (A == 2 ? r : 0)] = func(GetMode(first, C), GetMode(second, B));
+            program[GetStoreIndex(store, A)] = func(GetValue(first, C), GetValue(second, B));
+        }
+
+        private long GetStoreIndex(long store, long mode)
+        {
+            return store + (mode == 2 ? r : 0);
         }
 
         private void Add(long first, long second, long store)
@@ -180,41 +166,29 @@ namespace AoC2019
 
         private void JumpIfTrue(long first, long second)
         {
-            if (GetMode(first, C) != 0)
-            {
-                i = GetMode(second, B);
-            }
-            else
-            {
-                i += 3;
-            }
+            if (GetValue(first, C) != 0) i = GetValue(second, B);
+            else i += 3;
         }
 
         private void JumpIfFalse(long first, long second)
         {
-            if (GetMode(first, C) == 0)
-            {
-                i = GetMode(second, B);
-            }
-            else
-            {
-                i += 3;
-            }
+            if (GetValue(first, C) == 0) i = GetValue(second, B);
+            else i += 3;
         }
 
         private void LessThan(long first, long second, long store)
         {
-            program[store + (A == 2 ? r : 0)] = (GetMode(first, C) < GetMode(second, B)) ? 1 : 0;
+            program[GetStoreIndex(store, A)] = (GetValue(first, C) < GetValue(second, B)) ? 1 : 0;
         }
 
         private void Equals(long first, long second, long store)
         {
-            program[store + (A == 2 ? r : 0)] = (GetMode(first, C) == GetMode(second, B)) ? 1 : 0;
+            program[GetStoreIndex(store, A)] = (GetValue(first, C) == GetValue(second, B)) ? 1 : 0;
         }
 
         private void RelativeBase(long first)
         {
-            r += GetMode(first, C);
+            r += GetValue(first, C);
             i += 2;
         }
 
