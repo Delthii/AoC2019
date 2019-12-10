@@ -73,7 +73,7 @@ namespace AoC2019
 
         private List<Point> Asteroids(string[] input, out Point maxPoint, out int max)
         {
-            var astroids = InitAstroids(input);
+            var astroids = InitAsteroids(input);
 
             maxPoint = new Point(-1, -1);
             max = 0;
@@ -96,20 +96,19 @@ namespace AoC2019
             return astroids;
         }
 
-        private static List<Point> InitAstroids(string[] input)
+        private static List<Point> InitAsteroids(string[] input)
         {
-            var astroids = new List<Point>();
+            var asteroids = new List<Point>();
             for (int i = 0; i < input.Length; i++)
             {
                 var line = input[i];
                 for (int j = 0; j < line.Length; j++)
                 {
-                    if (line[j] == '#')
-                        astroids.Add(new Point(j, i));
+                    if (line[j] == '#') asteroids.Add(new Point(j, i));
                 }
             }
 
-            return astroids;
+            return asteroids;
         }
 
         private decimal Derivative(Point p1, Point p2)
