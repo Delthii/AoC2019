@@ -1,4 +1,6 @@
-﻿namespace AoC2019
+﻿using System;
+
+namespace AoC2019
 {
     public struct Point
     {
@@ -9,6 +11,16 @@
         {
             this.x = x;
             this.y = y;
+        }
+
+        public int ManhattanDistance(Point other)
+        {
+            return Math.Abs(x - other.x) + Math.Abs(y - other.y);
+        }
+
+        public override string ToString()
+        {
+            return x + " " + y;
         }
     }
 }
