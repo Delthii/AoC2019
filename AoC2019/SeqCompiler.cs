@@ -23,6 +23,7 @@ namespace AoC2019
         public long LastOut = -123132123;
         private long i;
         private long r;
+        private State state;
         long A = 0, B = 0, C = 0;
 
         public SeqCompiler(List<long> input, List<long> output, long[] program)
@@ -43,6 +44,11 @@ namespace AoC2019
             }
         }
 
+        public State GetState()
+        {
+            return state;
+        }
+
         public State Step()
         {
             var code = ParseInput();
@@ -58,7 +64,11 @@ namespace AoC2019
                     i += 4;
                     break;
                 case 3:
-                    if (Input.Count == 0) return State.Waiting;
+                    if (Input.Count == 0) 
+                {
+                    state = State.Waiting;
+                    return state;
+                }
                     program[GetStoreIndex(program[i+1], C)] = Input[0];
                     Input.RemoveAt(0);
                     i += 2;
@@ -85,12 +95,14 @@ namespace AoC2019
                     RelativeBase(program[i + 1]);
                     break;
                 case 99:
-                    return State.Done;
+                    state = State.Done;
+                    return state;
                 default:
                     throw new Exception("Invalid OP-Code");
             }
 
-            return State.Running;
+            state = State.Running;
+            return state;
         }
 
         public bool Done()
