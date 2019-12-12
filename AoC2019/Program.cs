@@ -11,7 +11,7 @@ namespace AoC2019
         {
             var da = new Day19_12();
             Console.WriteLine(da.PartA());
-            //Console.WriteLine(da.PartB());
+            Console.WriteLine(da.PartB());
         }
     }
 }

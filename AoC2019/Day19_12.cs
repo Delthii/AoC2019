@@ -10,67 +10,95 @@ namespace AoC2019
 {
     class Day19_12 : AbstractDay
     {
-        public Day19_12() : base (12,2019)
-        {
-            
-        }
+        public Day19_12() : base(12, 2019) { }
 
         public override string PartA()
         {
-            /*  <x=-7, y=-1, z=6>
-                <x=6, y=-9, z=-9>
-                <x=-12, y=2, z=-7>
-                <x=4, y=-17, z=-12> */
-            var input = File.ReadAllLines("..\\..\\in.txt");
-            var moons = new List<Moon>();
-            foreach (var l in Lines)
-            {
-                var r = new Regex(@"<x=([\S]+), y=([\S]+), z=([\S]+)>");
-                var m = r.Match(l);
-                var x = int.Parse(m.Groups[1].Value);
-                var y = int.Parse(m.Groups[2].Value);
-                var z = int.Parse(m.Groups[3].Value);
-                moons.Add(new Moon(x,y,z));
-            }
-
-            var init = "";
-            foreach (var moon in moons) init += moon.ToString();
-
-            for (long t = 0; ; t++)
+            var moons = Parse();
+            for (long t = 0; t < 1000; t++)
             {
                 foreach (var m1 in moons)
+                foreach (var m2 in moons)
                 {
-                    foreach (var m2 in moons)
-                    {
-                        if (m1 == m2) continue;
-                        m1.ApplyGravity(m2);
-                    }
+                    if (m1 == m2) continue;
+                    m1.ApplyAllGravity(m2);
                 }
-
-                var now = "";
-                foreach (var m in moons)
-                {
-                    m.ApplyVelocity();
-                    now += m.ToString();
-                }
-                if(t % 1000000 == 0) Console.WriteLine(t);
-                if (now == init)
-                {
-                    Console.WriteLine(t+1);
-                    break;
-                }
+                foreach (var m in moons) m.ApplyAllVelocity();
             }
-
-            var e = moons.Sum(m => m.Energy());
-
-            return "";
+            return moons.Sum(m => m.Energy()).ToString();
         }
 
         public override string PartB()
         {
-            throw new NotImplementedException();
+            var moons = Parse();
+            var X = GetTimestepForAxis(moons, 0);
+            var Y = GetTimestepForAxis(moons, 1);
+            var Z = GetTimestepForAxis(moons, 2);
+            return LCM(LCM(X, Y), Z).ToString();
+        }
+
+        private static List<Moon> Parse()
+        {
+            var input = File.ReadAllLines("..\\..\\in.txt");
+            var moons = new List<Moon>();
+            foreach (var l in input)
+            {
+                var m = new Regex(@"<x=([\S]+), y=([\S]+), z=([\S]+)>").Match(l);
+                moons.Add(new Moon(int.Parse(m.Groups[1].Value), int.Parse(m.Groups[2].Value), int.Parse(m.Groups[3].Value)));
+            }
+
+            return moons;
+        }
+
+        public long GetTimestepForAxis(List<Moon> moons, int axis)
+        {
+            var init = moons.Aggregate("", (current, m) => ConcatAxisState(current, m, axis));
+            for (long t = 1; ; t++)
+            {
+                foreach (var m1 in moons)
+                foreach (var m2 in moons)
+                {
+                    if (m1 == m2) continue;
+                    m1.ApplyGravity(m2, axis);
+                }
+                foreach (var m in moons) m.ApplyVelocity(axis);
+                var now = moons.Aggregate("", (current, m) => ConcatAxisState(current, m, axis));
+                if (init == now) return t;
+            }
+        }
+
+        private static string ConcatAxisState(string init, Moon m, int axis)
+        {
+            if (axis == 0)
+            {
+                init += m.x + " ";
+                init += m.vx + " ";
+                return init;
+            }
+            if (axis == 1)
+            {
+                init += m.y + " ";
+                init += m.vy + " ";
+                return init;
+            }
+            init += m.z + " ";
+            init += m.vz + " ";
+            return init;
+        }
+
+        private static long LCM(long a, long b)
+        {
+            return a * b / GCD(a, b);
+        }
+
+        private static long GCD(long a, long b)
+        {
+            if (a % b == 0) return b;
+            return GCD(b, a % b);
         }
     }
+
+    
 
     class Moon
     {
@@ -88,44 +116,46 @@ namespace AoC2019
             this.z = z;
         }
 
-        public void ApplyGravity(Moon m2)
+        public void ApplyGravity(Moon moon, int i)
         {
-            if (x < m2.x) vx++;
-            else if (x > m2.x) vx--;
-            if (y < m2.y) vy++;
-            else if (y > m2.y) vy--;
-            if (z < m2.z) vz++;
-            else if (z > m2.z) vz--;
+            if (i == 0)
+                if (x < moon.x) vx++;
+                else if (x > moon.x) vx--;
+            if (i == 1)
+                if (y < moon.y) vy++;
+                else if (y > moon.y) vy--;
+            if (i == 2)
+                if (z < moon.z) vz++;
+                else if (z > moon.z) vz--;
         }
 
-        public void ApplyVelocity()
+        public void ApplyAllGravity(Moon moon)
+        {
+            if (x < moon.x) vx++;
+            else if (x > moon.x) vx--;
+            if (y < moon.y) vy++;
+            else if (y > moon.y) vy--;
+            if (z < moon.z) vz++;
+            else if (z > moon.z) vz--;
+        }
+
+        public void ApplyVelocity(int axis)
+        {
+            if (axis == 0) x += vx;
+            if (axis == 1) y += vy;
+            if (axis == 2) z += vz;
+        }
+        public void ApplyAllVelocity()
         {
             x += vx;
             y += vy;
             z += vz;
         }
 
-        public int Energy()
-        {
-            var pos = Pos();
-            var vel = Vel();
-            return pos * vel;
-        }
+        public int Energy() => Pos() * Vel();
+        public int Vel() => Math.Abs(vx) + Math.Abs(vy) + Math.Abs(vz);
+        public int Pos() => Math.Abs(x) + Math.Abs(y) + Math.Abs(z);
 
-        public int Vel()
-        {
-            return Math.Abs(vx) + Math.Abs(vy) + Math.Abs(vz);
-        }
-
-        public int Pos()
-        {
-            return Math.Abs(x) + Math.Abs(y) + Math.Abs(z);
-        }
-
-        public override string ToString()
-        {
-            //return $"pos=<x={x}, y=  {x}, z= {x}>, vel=<x= {vx}, y= {vy}, z= {vz}>    pos= {Pos()}    vel= {Vel()}";
-            return $"{x}{y}{z}{Pos()}{Vel()}";
-        }
+        public override string ToString() => $"pos=<x={x}, y=  {x}, z= {x}>, vel=<x= {vx}, y= {vy}, z= {vz}> pos= {Pos()} vel= {Vel()}";
     }
 }
