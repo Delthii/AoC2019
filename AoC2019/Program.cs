@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace AoC2019
 {
@@ -9,7 +6,7 @@ namespace AoC2019
     {
         private static void Main(string[] args)
         {
-            var da = new Day19_12();
+            var da = new Day19_20();
             Console.WriteLine(da.PartA());
             Console.WriteLine(da.PartB());
         }

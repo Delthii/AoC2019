@@ -65,10 +65,10 @@ namespace AoC2019
                     break;
                 case 3:
                     if (Input.Count == 0) 
-                {
-                    state = State.Waiting;
-                    return state;
-                }
+                    {
+                        state = State.Waiting;
+                        return state;
+                    }
                     program[GetStoreIndex(program[i+1], C)] = Input[0];
                     Input.RemoveAt(0);
                     i += 2;
