@@ -44,6 +44,13 @@ namespace AoC2019
             }
         }
 
+        public void RunIt()
+        {
+            while (Step() != State.Running)
+            {
+            }
+        }
+
         public State GetState()
         {
             return state;

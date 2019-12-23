@@ -101,6 +101,8 @@
     <Compile Include="Day19_17.cs" />
     <Compile Include="Day19_2.cs" />
     <Compile Include="Day19_20.cs" />
+    <Compile Include="Day19_22.cs" />
+    <Compile Include="Day19_23.cs" />
     <Compile Include="Day19_3.cs" />
     <Compile Include="Day19_4.cs" />
     <Compile Include="Day19_6.cs" />
